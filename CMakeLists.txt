@@ -16,6 +16,7 @@ if(N2N_OPTION_AES)
 add_definitions(-DN2N_HAVE_AES)
 endif(N2N_OPTION_AES)
 
+# Crypto library selection
 if(USE_GCRYPT)
         add_definitions(-DUSE_GCRYPT=1)
         set(CRYPTO_LIB gcrypt)
@@ -44,19 +45,6 @@ endif(NOT DEFINED BUILD_SHARED_LIBS)
 if(NOT DEFINED CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE None)
 endif(NOT DEFINED CMAKE_BUILD_TYPE)
-#set(CMAKE_BUILD_TYPE Debug)
-#set(CMAKE_BUILD_TYPE Release)
-
-#Ultrasparc64 users experiencing SIGBUS should try the following gcc options
-#(thanks to Robert Gibbon) 
-#PLATOPTS_SPARC64=-mcpu=ultrasparc -pipe -fomit-frame-pointer -ffast-math -finline-functions -fweb -frename-registers -mapp-regs
-
-## DEBUG FOR CMAKE
-#message(${N2N_VERSION}) 
-#message(${N2N_OSNAME})
-##message(${CMAKE_BUILD_TYPE})
-#message(${N2N_OPTION_AES})
-## DEBUG FOR CMAKE
 
 add_library(n2n OBJECT
         n2n.c
@@ -66,6 +54,7 @@ add_library(n2n OBJECT
 set_property(TARGET n2n PROPERTY C_STANDARD 99)
 set(OBJECTS $<TARGET_OBJECTS:n2n>)
 
+# Platform-specific configuration
 if(DEFINED WIN32)
 set(CMAKE_RC_FLAGS /nologo)
 if (MSVC)
@@ -83,12 +72,11 @@ set(EDGE_RESOURCE ${CMAKE_CURRENT_SOURCE_DIR}/win32/edge.rc )
 set(SN_RESOURCE ${CMAKE_CURRENT_SOURCE_DIR}/win32/sn.rc )
 
 else(DEFINED WIN32)
-
 set(EDGE_RESOURCE )
 set(SN_RESOURCE )
-
 endif(DEFINED WIN32)
 
+# Build edge executable
 add_executable(edge
         edge.c
         aes.c
@@ -104,17 +92,29 @@ add_executable(edge
         tuntap_osx.c
         ${OBJECTS} ${EDGE_RESOURCE}
 )
+
+# Linux Capabilities - ¶¯Ì¬¼ì²â
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        target_link_libraries(edge cap)
+    find_library(CAP_LIB cap)
+    if(CAP_LIB)
+        target_link_libraries(edge ${CAP_LIB})
+        add_definitions(-DHAVE_LIBCAP)
+        message(STATUS "Found libcap: ${CAP_LIB}")
+    else()
+        message(STATUS "libcap not found, capabilities disabled")
+    endif()
 endif()
+
 set_property(TARGET edge PROPERTY C_STANDARD 99)
 
+# Build supernode executable
 add_executable(supernode
         sn.c
         ${OBJECTS} ${SN_RESOURCE}
 )
 set_property(TARGET supernode PROPERTY C_STANDARD 99)
 
+# Windows-specific configuration
 if(DEFINED WIN32)
 set_target_properties(edge PROPERTIES LINK_FLAGS "/manifestuac:level='requireAdministrator'")
 add_custom_command(
@@ -125,29 +125,19 @@ add_custom_command(
 )
 endif(DEFINED WIN32)
 
-# For Solaris (or OpenSolaris?)
-#target_link_libraries(edge socket nsl)
-#target_link_libraries(supernode socket nsl)
-
+# Link crypto library if AES is enabled
 if(N2N_OPTION_AES)
 target_link_libraries(edge ${CRYPTO_LIB})
 endif(N2N_OPTION_AES)
 
-if(NOT DEFINED WIN32)
-#add_executable(test test.c)
-#target_link_libraries(test n2n)
-
-#add_executable(benchmark benchmark.c)
-#target_link_libraries(benchmark n2n)
-endif(NOT DEFINED WIN32)
-
+# Installation
 install(TARGETS edge supernode
         RUNTIME DESTINATION sbin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
 )
 
-# Documentation
+# Documentation generation
 if(DEFINED UNIX)
 add_dependencies(n2n doc)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/doc)

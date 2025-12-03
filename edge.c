@@ -379,7 +379,7 @@ static int n2n_tick_transop( n2n_edge_t * eee, time_t now )
     /* Tests are done in order that most preferred transform is last and causes
      * tx_transop_idx to be left at most preferred valid transform. */
     tst = (eee->transop[N2N_TRANSOP_NULL_IDX].tick)( &(eee->transop[N2N_TRANSOP_NULL_IDX]), now );
-    
+
 
     tst = (eee->transop[N2N_TRANSOP_TF_IDX].tick)( &(eee->transop[N2N_TRANSOP_TF_IDX]), now );
     if ( tst.can_tx )
@@ -435,7 +435,7 @@ static int edge_init_keyschedule( n2n_edge_t * eee )
 
             idx = transop_enum_to_index( specs[i].t );
 
-            switch (idx) 
+            switch (idx)
             {
             case N2N_TRANSOP_TF_IDX:
             case N2N_TRANSOP_AESCBC_IDX:
@@ -450,7 +450,7 @@ static int edge_init_keyschedule( n2n_edge_t * eee )
 
             if (0 != retval)
             {
-                traceEvent( TRACE_ERROR, "keyschedule failed to add spec[%u] to transop[%d].\n", 
+                traceEvent( TRACE_ERROR, "keyschedule failed to add spec[%u] to transop[%d].\n",
                             (unsigned int)i, idx);
 
                 return retval;
@@ -526,7 +526,7 @@ void print_n2n_version() {
 #endif // N2N_HAVE_AES
     printf("Copyright 2007-09 - http://www.ntop.org\n"
            "Copyright 2018-19 - https://github.org/mxre/n2n\n\n");
-         
+
 }
 
 static void help() {
@@ -793,7 +793,7 @@ void try_send_register( n2n_edge_t * eee,
     if ( NULL == scan ) {
         macstr_t mac_buf;
         n2n_sock_str_t sockbuf;
-        
+
         scan = (struct peer_info*) calloc( 1, sizeof( struct peer_info ) );
 
         memcpy(scan->mac_addr, mac, N2N_MAC_SIZE);
@@ -1099,7 +1099,7 @@ static void update_supernode_reg( n2n_edge_t * eee, time_t nowTime )
             eee->sn_idx=0;
         }
 
-        traceEvent(TRACE_WARNING, "Supernode not responding - moving to %u of %u", 
+        traceEvent(TRACE_WARNING, "Supernode not responding - moving to %u of %u",
                    (unsigned int)eee->sn_idx, (unsigned int)eee->sn_num );
 
         eee->sup_attempts = N2N_EDGE_SUP_ATTEMPTS;
@@ -1223,7 +1223,7 @@ static int send_PACKET( n2n_edge_t * eee,
 
 
 /* Choose the transop for Tx. This should be based on the newest valid
- * cipherspec in the key schedule. 
+ * cipherspec in the key schedule.
  *
  * Never fall back to NULL tranform unless no key sources were specified. It is
  * better to render edge inoperative than to expose user data in the clear. In
@@ -1315,7 +1315,7 @@ static void send_packet2net(n2n_edge_t * eee,
 
     idx=0;
     encode_PACKET( pktbuf, &idx, &cmn, &pkt );
-    traceEvent( TRACE_DEBUG, "encoded PACKET header of size=%u transform %u (idx=%u)", 
+    traceEvent( TRACE_DEBUG, "encoded PACKET header of size=%u transform %u (idx=%u)",
                 (unsigned int)idx, (unsigned int)pkt.transform, (unsigned int)tx_transop_idx );
 
     idx += eee->transop[tx_transop_idx].fwd( &(eee->transop[tx_transop_idx]),
@@ -1445,7 +1445,7 @@ static int handle_PACKET( n2n_edge_t * eee,
 
     now = time(NULL);
 
-    traceEvent( TRACE_DEBUG, "handle_PACKET size %u transform %u", 
+    traceEvent( TRACE_DEBUG, "handle_PACKET size %u transform %u",
                 (unsigned int)psize, (unsigned int)pkt->transform );
     /* hexdump( payload, psize ); */
 
@@ -1492,7 +1492,7 @@ static int handle_PACKET( n2n_edge_t * eee,
         }
         else
         {
-            traceEvent( TRACE_ERROR, "handle_PACKET dropped unknown transform enum %u", 
+            traceEvent( TRACE_ERROR, "handle_PACKET dropped unknown transform enum %u",
                         (unsigned int)pkt->transform );
         }
     }
@@ -1578,7 +1578,7 @@ static void readFromMgmtSocket( n2n_edge_t * eee, int * keep_running )
         if ( 0 == memcmp (buf, "list", 4 ) )
         {
             msg_len=0;
-    
+
             macstr_t mac;
             n2n_sock_str_t sockaddr;
             struct peer_info* peer = eee->pending_peers;
@@ -1592,7 +1592,7 @@ static void readFromMgmtSocket( n2n_edge_t * eee, int * keep_running )
             msg_len += snprintf( (char*) (buf + msg_len), (N2N_PKT_BUF_SIZE - msg_len), "-\n");
             peer = eee->known_peers;
             while(peer) {
-                sock_to_cstr(sockaddr, &peer->sock);                
+                sock_to_cstr(sockaddr, &peer->sock);
                 msg_len += snprintf( (char*) (buf + msg_len), (N2N_PKT_BUF_SIZE - msg_len),
                     "%s %s\n", macaddr_str(mac, peer->mac_addr), sockaddr
                 );
@@ -1695,7 +1695,7 @@ static void readFromMgmtSocket( n2n_edge_t * eee, int * keep_running )
 
     msg_len += snprintf( (char*) (buf + msg_len), (N2N_PKT_BUF_SIZE - msg_len),
                          "peers  pend:%u full:%u\n",
-                         (unsigned int)peer_list_size( eee->pending_peers ), 
+                         (unsigned int)peer_list_size( eee->pending_peers ),
              (unsigned int)peer_list_size( eee->known_peers ) );
 
     msg_len += snprintf( (char*) (buf + msg_len), (N2N_PKT_BUF_SIZE - msg_len),
@@ -1769,7 +1769,7 @@ static void readFromIPSocket( n2n_edge_t * eee )
      * hop as sender. */
     orig_sender=&sender;
 
-    traceEvent(TRACE_INFO, "### Rx N2N UDP (%d) from %s", 
+    traceEvent(TRACE_INFO, "### Rx N2N UDP (%d) from %s",
                (signed int) recvlen, sock_to_cstr(sockbuf1, &sender) );
 
     /* hexdump( udp_buf, recvlen ); */
@@ -1869,7 +1869,7 @@ static void readFromIPSocket( n2n_edge_t * eee )
                 traceEvent(TRACE_NORMAL, "Rx REGISTER_SUPER_ACK myMAC=%s [%s] (external %s). Attempts %u",
                            macaddr_str( mac_buf1, ra.edgeMac ),
                            sock_to_cstr(sockbuf1, &sender),
-                           sock_to_cstr(sockbuf2, orig_sender), 
+                           sock_to_cstr(sockbuf2, orig_sender),
                            (unsigned int)eee->sup_attempts );
 
                 if ( 0 == memcmp( ra.cookie, eee->last_cookie, N2N_COOKIE_SIZE ) )
@@ -1962,7 +1962,7 @@ static int supernode2addr(n2n_sock_t * sn, int af, const n2n_sn_name_t addrIn) {
     if ( len > 0) {
         int ip_error = 0;
         char *supernode_port = NULL;
-        
+
         if (addr[len - 1] != ']') {
             supernode_port = strrchr(addr, ':');
             if ( supernode_port ) {
@@ -2112,15 +2112,15 @@ static int scan_address( char * ip_addr, size_t addr_size,
 }
 
 /** IP6 Address for TUNTAP device
- * 
+ *
  * s should be in the form of:
- * 
+ *
  * aa:bb:cc:ee::01
- * 
+ *
  * or
- * 
+ *
  * aa:bb:cc:ee::01/48
- * 
+ *
  * where 48 is the prefix length (netmask lenth), if not
  * provided, the string is not changed.
  */
@@ -2284,7 +2284,7 @@ int main(int argc, char* argv[])
     uid_t   userid = 0; /* root is the only guaranteed ID */
     gid_t   groupid = 0; /* root is the only guaranteed ID */
 #endif
-#ifdef N2N_HAS_CAPABILITIES
+#ifdef HAVE_LIBCAP
     cap_t caps, caps_original;
     cap_value_t caps_array[] = { CAP_NET_ADMIN, CAP_SETUID, CAP_SETGID };
     cap_flag_value_t is_flag_set;
@@ -2295,9 +2295,9 @@ int main(int argc, char* argv[])
 
     n2n_edge_t eee; /* single instance for this program */
 
-#ifdef N2N_HAS_CAPABILITIES
+#ifdef HAVE_LIBCAP
     prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_CLEAR_ALL, 0L, 0L, 0L);
-    
+
     caps_original = cap_get_proc();
     /* drop all capabilities, permit some for later */
     caps = cap_init();
@@ -2360,7 +2360,7 @@ int main(int argc, char* argv[])
     /* rebuilding argv has a serious bug, it does not recognize arguments with spaces,
      * therefore elimination use of key files in paths with spaces in them.
      * Also on Windows, when specifing adapters with -d, the can were not allowed
-     * to contain spaces. Removing this code fixes all that (albeit removing support for 
+     * to contain spaces. Removing this code fixes all that (albeit removing support for
      * the undocumented @config file feature. */
 #if 0
     for(i=1;i<argc;++i) {
@@ -2525,7 +2525,7 @@ int main(int argc, char* argv[])
             local_port = atoi(optarg);
             break;
         }
-        
+
         case 't':
         {
             if (optarg[0] == '/') {
@@ -2551,7 +2551,7 @@ int main(int argc, char* argv[])
         } /* end switch */
     }
 
-#ifdef N2N_HAS_CAPABILITIES
+#ifdef HAVE_LIBCAP
     /* set effective capability to set uid/gid */
     caps = cap_init();
     cap_set_flag(caps, CAP_PERMITTED, 3, caps_array, CAP_SET);
@@ -2616,7 +2616,7 @@ int main(int argc, char* argv[])
 
     if ( (NULL == encrypt_key ) && ( 0 == strlen(eee.keyschedule)) ) {
         traceEvent(TRACE_WARNING, "Encryption is disabled in edge.");
-        
+
         eee.null_transop = 1;
     }
 
@@ -2626,7 +2626,7 @@ int main(int argc, char* argv[])
 
         eee.dyn_ip_mode = 1;
     } else {
-        traceEvent(TRACE_NORMAL, "ip_mode='%s'", ip_mode);        
+        traceEvent(TRACE_NORMAL, "ip_mode='%s'", ip_mode);
     }
 
     tuntap_config.if_name = tuntap_dev_name;
@@ -2651,17 +2651,17 @@ int main(int argc, char* argv[])
          traceEvent(TRACE_ERROR, "invalid ipv4 address: %s", ip_addr);
     }
     tuntap_config.ip_prefixlen = ip_prefixlen;
-    
+
     if (ip6_addr[0] == '\0')
         tuntap_config.ip6_prefixlen = 0;
-    else {    
+    else {
         if (inet_pton(AF_INET6, ip6_addr, &tuntap_config.ip6_addr) != 1) {
             traceEvent(TRACE_ERROR, "invalid ipv6 address: %s", ip6_addr);
         }
         tuntap_config.ip6_prefixlen = ip6_prefixlen;
     }
 
-#if defined(N2N_HAS_CAPABILITIES)
+#if defined(HAVE_LIBCAP)
     /* set effective capabilitiy NET_ADMIN */
     caps = cap_init();
     cap_set_flag(caps, CAP_EFFECTIVE, 1, caps_array, CAP_SET);
@@ -2677,14 +2677,14 @@ int main(int argc, char* argv[])
     if(tuntap_open(&(eee.device), &tuntap_config) < 0)
         return(-1);
 
-#if defined(N2N_HAS_CAPABILITIES)
+#if defined(HAVE_LIBCAP)
     /* drop capabilities */
     caps = cap_init();
     cap_set_proc(caps);
     cap_free(caps);
 #elif !defined(_WIN32)
     if ( (userid != 0) || (groupid != 0 ) ) {
-        traceEvent(TRACE_NORMAL, "Interface up. Dropping privileges to uid=%d, gid=%d", 
+        traceEvent(TRACE_NORMAL, "Interface up. Dropping privileges to uid=%d, gid=%d",
                    (signed int)userid, (signed int)groupid);
 
         /* Finished with the need for root privileges. Drop to unprivileged user. */
@@ -2692,7 +2692,7 @@ int main(int argc, char* argv[])
         setreuid( userid, userid );
     }
 #endif
-    
+
     if(local_port > 0)
         traceEvent(TRACE_NORMAL, "Binding to local port %d", (signed int)local_port);
 
@@ -2832,11 +2832,11 @@ static int run_loop(n2n_edge_t * eee )
         if ( numPurged > 0 )
         {
             traceEvent( TRACE_NORMAL, "Peer removed: pending=%u, operational=%u",
-                        (unsigned int)peer_list_size( eee->pending_peers ), 
+                        (unsigned int)peer_list_size( eee->pending_peers ),
                         (unsigned int)peer_list_size( eee->known_peers ) );
         }
 
-        if ( eee->dyn_ip_mode && 
+        if ( eee->dyn_ip_mode &&
              (( nowTime - lastIfaceCheck ) > IFACE_UPDATE_INTERVAL ) )
         {
             traceEvent(TRACE_NORMAL, "Re-checking dynamic IP address.");

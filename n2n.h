@@ -42,7 +42,7 @@
 #define N2N_HAVE_SETUID 1
 #ifdef __linux__
 #define N2N_CAN_NAME_IFACE 1
-#define N2N_HAS_CAPABILITIES 1
+/* 不再硬编码定义 N2N_HAS_CAPABILITIES，改为使用 HAVE_LIBCAP */
 #endif
 #endif
 
@@ -74,10 +74,12 @@
 
 #ifdef __linux__
 #include <sys/prctl.h>
-#include <sys/capability.h>
 #include <linux/if.h>
 #include <linux/if_tun.h>
-#include <linux/prctl.h>
+/* 只有在 HAVE_LIBCAP 定义时才包含 capability.h */
+#ifdef HAVE_LIBCAP
+#include <sys/capability.h>
+#endif /* HAVE_LIBCAP */
 #endif /* #ifdef __linux__ */
 
 #ifdef __FreeBSD__
@@ -139,6 +141,10 @@ typedef struct ether_hdr ether_hdr_t;
 #endif /* #ifdef _WIN32 */
 
 #include "n2n_wire.h"
+
+#if defined(N2N_HAS_CAPABILITIES)
+#include <sys/capability.h>
+#endif
 
 typedef struct route {
     int family;
@@ -275,7 +281,7 @@ extern char * sock_to_cstr( n2n_sock_str_t out,
 
 extern uint32_t ip4_prefixlen_to_netmask(uint8_t prefixlen);
 
-extern int sock_equal( const n2n_sock_t * a, 
+extern int sock_equal( const n2n_sock_t * a,
                        const n2n_sock_t * b );
 
 extern uint8_t is_multi_broadcast(const uint8_t * dest_mac);
@@ -291,7 +297,7 @@ struct peer_info * find_peer_by_mac( struct peer_info * list,
 void   peer_list_add( struct peer_info * * list,
                       struct peer_info * element );
 size_t peer_list_size( const struct peer_info * list );
-size_t purge_peer_list( struct peer_info ** peer_list, 
+size_t purge_peer_list( struct peer_info ** peer_list,
                         time_t purge_before );
 size_t clear_peer_list( struct peer_info ** peer_list );
 size_t purge_expired_registrations( struct peer_info ** peer_list );
